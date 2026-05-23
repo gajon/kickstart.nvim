@@ -483,6 +483,30 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Autohighlight word under cursor
+  _G.cursorword_blocklist = function()
+    local curword = vim.fn.expand('<cword>')
+    local filetype = vim.bo.filetype
+
+    -- Add any disabling global or filetype-specific logic here
+    local blocklist = {}
+    if filetype == 'lua' then
+      blocklist = { 'local', 'require' }
+    elseif filetype == 'javascript' then
+      blocklist = { 'import' }
+    elseif filetype == 'ruby' then
+      blocklist = { 'if', 'elsif', 'else', 'do', 'end', 'class', 'def', 'module', 'belongs_to', 'has_many', 'scope' }
+    end
+
+    vim.b.minicursorword_disable = vim.tbl_contains(blocklist, curword)
+  end
+
+  -- Make sure to add this autocommand *before* calling module's `setup()`.
+  vim.cmd('au CursorMoved * lua _G.cursorword_blocklist()')
+
+  require('mini.cursorword').setup({})
+
+
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin

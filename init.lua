@@ -89,6 +89,8 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
 -- ============================================================
 do
+  HOME = os.getenv('HOME')
+
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
@@ -99,7 +101,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -107,10 +109,10 @@ do
   --  For more options, you can see `:help option-list`
 
   -- Make line numbers default
-  vim.o.number = true
+  -- vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -122,7 +124,7 @@ do
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
   --  Remove this option if you want your OS clipboard to remain independent.
   --  See `:help 'clipboard'`
-  vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+  -- vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
   -- Enable break indent
   vim.o.breakindent = true
@@ -171,6 +173,35 @@ do
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+
+  -- OTHER
+  vim.o.backup = true
+  vim.o.backupdir = HOME .. '/.local/state/nvim/backup//'
+  vim.o.colorcolumn = '80,120'
+  -- vim.o.diffopt = 'internal,filler,vertical'
+  vim.o.expandtab = true
+  vim.o.title = true
+  vim.o.wrap = false
+
+  -- [[ Cursorline only in Normal mode ]]
+  -- Only show cursorline in the current window and in normal mode.
+  -- https://github.com/arnvald/viml-to-lua/blob/main/lua/settings.lua
+  vim.cmd([[
+    augroup cline
+        au!
+        au WinLeave * set nocursorline
+        au WinEnter * set cursorline
+        au InsertEnter * set nocursorline
+        au InsertLeave * set cursorline
+    augroup END
+  ]])
+
+  -- [[ Restore last cursor position when opening a file ]]
+  -- :help restore-cursor
+  vim.cmd([[
+    autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+  ]])
 
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
@@ -353,6 +384,7 @@ do
   -- Adds git related signs to the gutter, as well as utilities for managing changes
   vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
   require('gitsigns').setup {
+    current_line_blame = true,
     signs = {
       add = { text = '+' }, ---@diagnostic disable-line: missing-fields
       change = { text = '~' }, ---@diagnostic disable-line: missing-fields
@@ -366,7 +398,7 @@ do
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
     -- Delay between pressing a key and opening which-key (milliseconds)
-    delay = 0,
+    delay = 350,
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
@@ -387,14 +419,14 @@ do
   ---@diagnostic disable-next-line: missing-fields
   require('tokyonight').setup {
     styles = {
-      comments = { italic = false }, -- Disable italics in comments
+      comments = { italic = true }, -- Enable italics in comments
     },
   }
 
   -- Load the colorscheme here.
   -- Like many other themes, this one has different styles, and you could load
   -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  vim.cmd.colorscheme 'tokyonight-moon'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -494,6 +526,9 @@ do
     --   },
     -- },
     -- pickers = {}
+    defaults = {
+      file_ignore_patterns = { "^vendor/cache", "^vendor/bundle" },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },

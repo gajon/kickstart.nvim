@@ -210,6 +210,9 @@ do
   --  See `:help hlsearch`
   vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+  -- Complete previous line
+  vim.keymap.set('i', '<C-l>', '<C-x><C-l>')
+
   -- Diagnostic Config & Keymaps
   --  See `:help vim.diagnostic.Opts`
   vim.diagnostic.config {
@@ -254,16 +257,38 @@ do
   --  Use CTRL+<hjkl> to switch between windows
   --
   --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+  -- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  -- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  -- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  -- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+  -- [[ Move to a window and maximize the area ]]
+  vim.keymap.set('n', '<C-h>', '<C-w>h126<C-w><Bar>', { desc = 'Move focus to the left window and maximize' })
+  vim.keymap.set('n', '<C-l>', '<C-w>l126<C-w><Bar>', { desc = 'Move focus to the right window and maximize' })
+  vim.keymap.set('n', '<C-j>', '<C-w>j<C-w>_', { desc = 'Move focus to the lower window and maximize' })
+  vim.keymap.set('n', '<C-k>', '<C-w>k<C-w>_', { desc = 'Move focus to the upper window and maximize' })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
   -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
   -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
   -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+  -- Highlight the word under the cursor without jumping (thanks ChatGTP).
+  vim.keymap.set('n', '<Leader>*', ":let @/ = '\\<<C-r><C-w>\\>'<CR>:set hls<CR>", { desc = 'Highlight word under cursor' })
+
+  -- Strip all trailing whitespace in the current file
+  vim.keymap.set('n', '<leader>W', ":%s/\\s\\+$//<cr>:let @/=''<CR>", { desc = 'Strip trailing whitespace' })
+
+  -- Open files in the same directory as the current directory
+  vim.cmd([[
+  cnoremap %% <C-R>=expand('%:h').'/'<cr>
+  map <leader>e :edit %%
+  ]])
+
+  -- Cycle buffers
+  vim.keymap.set('n', '<C-n>', ':bnext<CR>', { desc = 'Cycle buffers' })
+  vim.keymap.set('n', '<C-p>', ':bprev<CR>', { desc = 'Cycle buffers' })
 
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`

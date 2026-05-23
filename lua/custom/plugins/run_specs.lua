@@ -116,26 +116,6 @@ function M.run_nearest_test()
 end
 
 --------------------------------------------------
--- PROMOTE A VARIABLE TO RSPEC LET.
--- From https://github.com/garybernhardt/dotfiles/blob/master/.vimrc
-function M.promote_to_let()
-  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-  local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-
-  if line == nil then
-    return
-  end
-
-  local promoted, replacements = line:gsub('(%w+) = (.*)$', 'let(:%1) { %2 }', 1)
-  if replacements == 0 then
-    return
-  end
-
-  vim.api.nvim_buf_set_lines(0, row, row + 1, false, { promoted })
-  vim.api.nvim_command 'normal! =='
-end
-
---------------------------------------------------
 -- The commands for ruby files
 local ruby_custom_mappings = vim.api.nvim_create_augroup('ruby_custom_mappings', { clear = true })
 
@@ -147,7 +127,6 @@ vim.api.nvim_create_autocmd('FileType', {
       vim.keymap.set('n', lhs, rhs, { buffer = event.buf, silent = true, desc = desc })
     end
 
-    ruby_map('\\p', M.promote_to_let, 'Promote variable to let')
     ruby_map('\\t', M.run_test_file, 'Run test file')
     ruby_map('\\T', M.run_nearest_test, 'Run nearest test')
   end,

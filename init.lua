@@ -147,7 +147,7 @@ do
 
   -- Configure how new splits should be opened
   vim.o.splitright = true
-  vim.o.splitbelow = true
+  vim.o.splitbelow = false
 
   -- Sets how neovim will display certain whitespace characters in the editor.
   --  See `:help 'list'`
@@ -1054,7 +1054,7 @@ do
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`

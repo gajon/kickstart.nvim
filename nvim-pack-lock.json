@@ -87,6 +87,10 @@
       "rev": "5496d7c94581c4c9ad7430357449bb57fc59f501",
       "src": "https://github.com/tpope/vim-rhubarb"
     },
+    "vim-slim": {
+      "rev": "a0a57f75f20a03d5fa798484743e98f4af623926",
+      "src": "https://github.com/slim-template/vim-slim"
+    },
     "vim-slime": {
       "rev": "2cfdc3b24e7ebaa64f5a1a04b00555600c622b79",
       "src": "https://github.com/jpalardy/vim-slime"

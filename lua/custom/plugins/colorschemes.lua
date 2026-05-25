@@ -34,6 +34,26 @@ do -- NeoSolarized
   vim.g.neosolarized_termBoldAsBright = 1
 end
 
+do -- PaperColor
+  vim.pack.add { 'https://github.com/NLKNguyen/papercolor-theme' }
+  -- let g:PaperColor_Theme_Options = {
+  -- \   'theme': {
+  -- \     'default': {
+  -- \       'transparent_background': 1
+  -- \     }
+  -- \   }
+  -- \ }
+
+  -- Currently available theme options
+  --
+  -- option                   | value                                          | default
+  -- ------                   | ------                                         | -------
+  -- `transparent_background` | 1: use terminal background                     | 0: use theme background
+  -- `allow_bold`             | 1: use bold for certain text, 0: not at all    | decided by the theme
+  -- `allow_italic`           | 1: use italics for certain text, 0: not at all | decided by the theme
+  -- `override`               | dictionary of color key-value                  |
+end
+
 do -- tokyonight
   vim.pack.add { 'https://github.com/folke/tokyonight.nvim' }
   ---@diagnostic disable-next-line: missing-fields
@@ -48,6 +68,7 @@ do -- tokyonight
 end
 
 -- NeoSolarized
+-- PaperColor
 -- tokyonight-day
 -- tokyonight-moon
 -- tokyonight-night

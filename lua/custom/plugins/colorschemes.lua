@@ -4,6 +4,20 @@
 --
 -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
 
+do -- Gruvbox Material
+  vim.pack.add { 'https://github.com/sainnhe/gruvbox-material' }
+
+  vim.g.gruvbox_material_enable_italic = true
+  -- The background contrast used in this color scheme.
+  -- Available values: 'hard', 'medium'(default), 'soft'
+  vim.g.gruvbox_material_background = 'hard'
+  -- The foreground color palette used in this color scheme.
+  -- Available values: 'material' (default), 'mix', 'original'
+  vim.g.gruvbox_material_foreground = 'material'
+
+  -- An alternative gruvbox is 'ellisonleao/gruvbox.nvim'
+end
+
 do -- NeoSolarized
   vim.pack.add { 'https://github.com/overcache/NeoSolarized' }
 
@@ -67,6 +81,7 @@ do -- tokyonight
   -- 'tokyonight-moon'
 end
 
+-- gruvbox-material
 -- NeoSolarized
 -- PaperColor
 -- tokyonight-day

@@ -5,6 +5,10 @@
       "src": "https://github.com/L3MON4D3/LuaSnip",
       "version": "2.0.0 - 3.0.0"
     },
+    "NeoSolarized": {
+      "rev": "b94b1a9ad51e2de015266f10fdc6e142f97bd617",
+      "src": "https://github.com/overcache/NeoSolarized"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",

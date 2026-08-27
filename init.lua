@@ -89,6 +89,8 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
 -- ============================================================
 do
+  HOME = os.getenv('HOME')
+
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
@@ -99,7 +101,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -107,10 +109,10 @@ do
   --  For more options, you can see `:help option-list`
 
   -- Make line numbers default
-  vim.o.number = true
+  -- vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -122,7 +124,7 @@ do
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
   --  Remove this option if you want your OS clipboard to remain independent.
   --  See `:help 'clipboard'`
-  vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+  -- vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
   -- Enable break indent
   vim.o.breakindent = true
@@ -145,7 +147,7 @@ do
 
   -- Configure how new splits should be opened
   vim.o.splitright = true
-  vim.o.splitbelow = true
+  vim.o.splitbelow = false
 
   -- Sets how neovim will display certain whitespace characters in the editor.
   --  See `:help 'list'`
@@ -172,12 +174,49 @@ do
   -- See `:help 'confirm'`
   vim.o.confirm = true
 
+  -- OTHER
+  vim.o.backup = true
+  vim.o.backupdir = HOME .. '/.local/state/nvim/backup//'
+  vim.o.colorcolumn = '80,120'
+  -- vim.o.diffopt = 'internal,filler,vertical'
+  vim.o.expandtab = true
+  vim.o.title = true
+  vim.o.wrap = false
+
+  -- [[ Cursorline only in Normal mode ]]
+  -- Only show cursorline in the current window and in normal mode.
+  -- https://github.com/arnvald/viml-to-lua/blob/main/lua/settings.lua
+  vim.cmd([[
+    augroup cline
+        au!
+        au WinLeave * set nocursorline
+        au WinEnter * set cursorline
+        au InsertEnter * set nocursorline
+        au InsertLeave * set cursorline
+    augroup END
+  ]])
+
+  -- jbuilder syntax highlighting
+  vim.cmd([[
+    autocmd BufNewFile,BufRead *.json.jbuilder set ft=ruby
+  ]])
+
+  -- [[ Restore last cursor position when opening a file ]]
+  -- :help restore-cursor
+  vim.cmd([[
+    autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+  ]])
+
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
 
   -- Clear highlights on search when pressing <Esc> in normal mode
   --  See `:help hlsearch`
   vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+  -- Complete previous line
+  vim.keymap.set('i', '<C-l>', '<C-x><C-l>')
 
   -- Diagnostic Config & Keymaps
   --  See `:help vim.diagnostic.Opts`
@@ -223,16 +262,38 @@ do
   --  Use CTRL+<hjkl> to switch between windows
   --
   --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+  -- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  -- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  -- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  -- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+  -- [[ Move to a window and maximize the area ]]
+  vim.keymap.set('n', '<C-h>', '<C-w>h126<C-w><Bar>', { desc = 'Move focus to the left window and maximize' })
+  vim.keymap.set('n', '<C-l>', '<C-w>l126<C-w><Bar>', { desc = 'Move focus to the right window and maximize' })
+  vim.keymap.set('n', '<C-j>', '<C-w>j<C-w>_', { desc = 'Move focus to the lower window and maximize' })
+  vim.keymap.set('n', '<C-k>', '<C-w>k<C-w>_', { desc = 'Move focus to the upper window and maximize' })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
   -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
   -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
   -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+  -- Highlight the word under the cursor without jumping (thanks ChatGTP).
+  vim.keymap.set('n', '<Leader>*', ":let @/ = '\\<<C-r><C-w>\\>'<CR>:set hls<CR>", { desc = 'Highlight word under cursor' })
+
+  -- Strip all trailing whitespace in the current file
+  vim.keymap.set('n', '<leader>W', ":%s/\\s\\+$//<cr>:let @/=''<CR>", { desc = 'Strip trailing whitespace' })
+
+  -- Open files in the same directory as the current directory
+  vim.cmd([[
+  cnoremap %% <C-R>=expand('%:h').'/'<cr>
+  map <leader>e :edit %%
+  ]])
+
+  -- Cycle buffers
+  vim.keymap.set('n', '<C-n>', ':bnext<CR>', { desc = 'Cycle buffers' })
+  vim.keymap.set('n', '<C-p>', ':bprev<CR>', { desc = 'Cycle buffers' })
 
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
@@ -353,6 +414,7 @@ do
   -- Adds git related signs to the gutter, as well as utilities for managing changes
   vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
   require('gitsigns').setup {
+    current_line_blame = true,
     signs = {
       add = { text = '+' }, ---@diagnostic disable-line: missing-fields
       change = { text = '~' }, ---@diagnostic disable-line: missing-fields
@@ -366,7 +428,7 @@ do
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
     -- Delay between pressing a key and opening which-key (milliseconds)
-    delay = 0,
+    delay = 350,
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
@@ -378,23 +440,7 @@ do
   }
 
   -- [[ Colorscheme ]]
-  -- You can easily change to a different colorscheme.
-  -- Change the name of the colorscheme plugin below, and then
-  -- change the command under that to load whatever the name of that colorscheme is.
-  --
-  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
-  ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
-    },
-  }
-
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  -- See lua/custom/plugins/colorschemes.lua
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -426,12 +472,68 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Autohighlight word under cursor
+  _G.cursorword_blocklist = function()
+    local curword = vim.fn.expand('<cword>')
+    local filetype = vim.bo.filetype
+
+    -- Add any disabling global or filetype-specific logic here
+    local blocklist = {}
+    if filetype == 'lua' then
+      blocklist = { 'local', 'require' }
+    elseif filetype == 'javascript' then
+      blocklist = { 'import' }
+    elseif filetype == 'ruby' then
+      blocklist = { 'if', 'elsif', 'else', 'do', 'end', 'class', 'def', 'module', 'belongs_to', 'has_many', 'scope' }
+    end
+
+    vim.b.minicursorword_disable = vim.tbl_contains(blocklist, curword)
+  end
+
+  -- Make sure to add this autocommand *before* calling module's `setup()`.
+  vim.cmd('au CursorMoved * lua _G.cursorword_blocklist()')
+
+  require('mini.cursorword').setup({})
+
+
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin
   local statusline = require 'mini.statusline'
   -- Set `use_icons` to true if you have a Nerd Font
-  statusline.setup { use_icons = vim.g.have_nerd_font }
+  statusline.setup {
+    -- Content of statusline as functions which return statusline string. See
+    -- `:h statusline` and code of default contents (used instead of `nil`).
+    content = {
+      -- Content for active window
+      active = function()
+        local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+        -- local git           = MiniStatusline.section_git({ trunc_width = 40 })
+        local diff          = MiniStatusline.section_diff({ trunc_width = 75 })
+        local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+        local lsp           = MiniStatusline.section_lsp({ trunc_width = 75 })
+        local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
+        local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+        local location      = MiniStatusline.section_location({ trunc_width = 75 })
+        local search        = MiniStatusline.section_searchcount({ trunc_width = 75 })
+
+        return MiniStatusline.combine_groups({
+          { hl = mode_hl,                  strings = { mode } },
+          { hl = 'MiniStatuslineDevinfo',  strings = { diff, diagnostics, lsp } },
+          '%<', -- Mark general truncate point
+          { hl = 'MiniStatuslineFilename', strings = { filename } },
+          '%=', -- End left alignment
+          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          { hl = mode_hl,                  strings = { search, location } },
+        })
+      end,
+      -- Content for inactive window(s)
+      inactive = nil,
+    },
+
+    -- Whether to use icons by default
+    use_icons = vim.g.have_nerd_font,
+  }
 
   -- You can configure sections in the statusline by overriding their
   -- default behavior. For example, here we set the section for
@@ -494,6 +596,9 @@ do
     --   },
     -- },
     -- pickers = {}
+    defaults = {
+      file_ignore_patterns = { "^vendor/cache", "^vendor/bundle" },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },
@@ -690,6 +795,7 @@ do
     -- gopls = {},
     -- pyright = {},
     -- rust_analyzer = {},
+    -- ruby_lsp = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
@@ -818,8 +924,9 @@ do
   --    See the README about individual language/framework/plugin snippets:
   --    https://github.com/rafamadriz/friendly-snippets
   --
-  -- vim.pack.add { gh 'rafamadriz/friendly-snippets' }
-  -- require('luasnip.loaders.from_vscode').lazy_load()
+  vim.pack.add { gh 'rafamadriz/friendly-snippets' }
+  require('luasnip.loaders.from_vscode').lazy_load()
+  require('luasnip').filetype_extend("ruby", {"rails"})
 
   -- [[ Autocomplete Engine ]]
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
@@ -847,6 +954,8 @@ do
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
       preset = 'default',
+      ['<C-n>'] = { 'select_next', 'fallback' },
+      ['<C-p>'] = { 'select_prev', 'fallback' },
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -866,6 +975,20 @@ do
 
     sources = {
       default = { 'lsp', 'path', 'snippets' },
+      providers = {
+        buffer = {
+          opts = {
+            -- get all buffers, even ones like neo-tree
+            -- get_bufnrs = vim.api.nvim_list_bufs
+            -- or (recommended) filter to only "normal" buffers
+            get_bufnrs = function()
+              return vim.tbl_filter(function(bufnr)
+                return vim.bo[bufnr].buftype == ''
+              end, vim.api.nvim_list_bufs())
+            end
+          }
+        }
+      }
     },
 
     snippets = { preset = 'luasnip' },
@@ -901,6 +1024,10 @@ do
   local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
   require('nvim-treesitter').install(parsers)
 
+  local disabled_parsers = {
+    gitcommit = true,
+  }
+
   ---@param buf integer
   ---@param language string
   local function treesitter_try_attach(buf, language)
@@ -929,6 +1056,7 @@ do
 
       local language = vim.treesitter.language.get_lang(filetype)
       if not language then return end
+      if disabled_parsers[language] then return end
 
       local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
 
@@ -951,6 +1079,9 @@ end
 -- kickstart.plugins.* examples
 -- ============================================================
 do
+  vim.pack.add { gh 'slim-template/vim-slim' }
+  vim.pack.add { gh 'kchmck/vim-coffee-script' }
+
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -965,12 +1096,12 @@ do
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
-  -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
+  require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`

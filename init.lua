@@ -196,6 +196,11 @@ do
     augroup END
   ]])
 
+  -- jbuilder syntax highlighting
+  vim.cmd([[
+    autocmd BufNewFile,BufRead *.json.jbuilder set ft=ruby
+  ]])
+
   -- [[ Restore last cursor position when opening a file ]]
   -- :help restore-cursor
   vim.cmd([[
